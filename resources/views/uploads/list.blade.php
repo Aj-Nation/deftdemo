@@ -20,6 +20,7 @@
     <thead>
         <tr>
           <td>Sl No</td>
+          <td>Username</td>
           <td>Filename</td>
           <td>Image</td>
           <td colspan = 2>Actions</td>
@@ -30,8 +31,9 @@
         @foreach($images as $image)
         <tr>
             <td>{{$i++}}</td>
+            <td>{{$image->user_name}}</td>
             <td>{{$image->file_name}}</td>
-            <td><img src="{{url('/images').'/'.$image->file_name}}" alt="{{$image->file_name}}" width="100" height="100"></td>
+            <td><img src="uploads/fetch_image/{{ $image->id }}" alt="{{$image->file_name}}" width="100" height="100"></td>
             <td>
                 <form action="{{ route('uploads.destroy', $image->id)}}" method="post">
                   @csrf

@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('uploads');
 });
 
 Route::resource('uploads', 'UploadController');
+Route::get('uploads/fetch_image/{id}', 'UploadController@fetch_image');

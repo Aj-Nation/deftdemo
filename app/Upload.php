@@ -12,6 +12,8 @@ class Upload extends Model
      * @var array
      */
     protected $fillable = [
-        'file_name'
+        'user_name',
+        'file_name',
+        'user_image'
     ];
 }

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Upload;
 use Illuminate\Http\Request;
+use Intervention\Image\ImageManagerStatic as Image;
+use Illuminate\Support\Facades\Response;
 
 class UploadController extends Controller
 {
@@ -37,35 +39,28 @@ class UploadController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $this->validate($request, [
 
-                'file_name' => 'required',
-                'filename.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
-    
-            ]);
-
-            if($request->hasfile('file_name'))
+            if($request->hasfile('user_image'))
             {
-               foreach($request->file('file_name') as $image)
-               {
-                   $upload = new Upload();
-                   $name   = $image->getClientOriginalName();
-                   $image->move(public_path().'/images/', $name);  
 
-                   $upload->file_name = $name;
-                   $upload->save();
+               foreach($request->file('user_image') as $image_file)
+               {
+                    $name  = $image_file->getClientOriginalName();
+                    $image = Image::make($image_file);
+                    Response::make($image->encode('jpeg'));
+
+                   $form_data = array(
+                    'user_name' => $request->user_name,
+                    'file_name'  => $name,
+                    'user_image' => $image
+                   );
+
+                   Upload::create($form_data);
 
                }
             }
             return redirect()->route('uploads.index')
-            ->with('success','Images has been uploaded successfully.');
-
-        } catch (\Exception $ex) {
-            return back()->with('errors', $ex->getMessage());
-        }
-       
-        
+            ->with('success','Images has been uploaded successfully.');   
     }
 
     /**
@@ -80,5 +75,24 @@ class UploadController extends Controller
   
         return redirect()->route('uploads.index')
                         ->with('success','Image deleted successfully');
+    }
+
+    /**
+     * Fetch Image
+     *
+     * @param int $image_id
+     * @return void
+     */
+    public function fetch_image($image_id)
+    {
+        $image = Upload::findOrFail($image_id);
+
+        $image_file = Image::make($image->user_image);
+
+        $response = Response::make($image_file->encode('jpeg'));
+
+        $response->header('Content-Type', 'image/jpeg');
+
+        return $response;
     }
 }
